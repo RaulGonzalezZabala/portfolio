@@ -1,0 +1,27 @@
+# Dependencias de Node
+node_modules/
+frontend/node_modules/
+
+# Compilaciones y cobertura
+frontend/dist/
+dist/
+coverage/
+
+# Variables locales y credenciales
+.env
+.env.*
+!.env.example
+frontend/.env
+backend/.env
+
+# Registros y archivos temporales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# Configuración local de editores
+.vscode/
+.idea/
