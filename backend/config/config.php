@@ -21,5 +21,12 @@ function getConfig(): array
             'password' => $environment['DB_PASSWORD'] ?? '',
         ],
         'corsAllowedOrigin' => $environment['CORS_ALLOWED_ORIGIN'] ?? 'http://localhost:5173',
+        'frontendBaseUrl' => $environment['FRONTEND_BASE_URL'] ?? 'http://localhost:5173',
+        'email' => [
+            'provider' => $environment['EMAIL_PROVIDER'] ?? 'brevo',
+            'apiKey' => $environment['BREVO_API_KEY'] ?? '',
+            'fromEmail' => $environment['MAIL_FROM_EMAIL'] ?? '',
+            'fromName' => $environment['MAIL_FROM_NAME'] ?? 'TicketPulse',
+        ],
     ];
 }

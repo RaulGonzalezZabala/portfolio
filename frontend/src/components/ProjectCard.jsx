@@ -8,14 +8,18 @@ function ProjectCard({ project, isSelected, onSelect }) {
         <ul className="technology-list" aria-label={`Tecnologías de ${project.title}`}>
           {project.technologies.map((technology) => <li key={technology.slug}>{technology.name}</li>)}
         </ul>
-        <button
-          className="text-button"
-          type="button"
-          onClick={() => onSelect(project)}
-          aria-pressed={isSelected}
-        >
-          {isSelected ? 'Viendo detalle' : 'Ver detalle'}
-        </button>
+        {project.internalPath ? (
+          <a className="text-button" href={project.internalPath}>Abrir demo</a>
+        ) : (
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => onSelect(project)}
+            aria-pressed={isSelected}
+          >
+            {isSelected ? 'Viendo detalle' : 'Ver detalle'}
+          </button>
+        )}
       </div>
     </article>
   )

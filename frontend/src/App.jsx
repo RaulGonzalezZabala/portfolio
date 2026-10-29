@@ -6,15 +6,31 @@ import Hero from './components/Hero'
 import ProjectDetail from './components/ProjectDetail'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
+import TicketPulsePage from './pages/TicketPulsePage'
 import { getProjects } from './services/api'
 
 function App() {
+  const [isTicketPulse, setIsTicketPulse] = useState(window.location.hash.split('?')[0] === '#/ticket-pulse')
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    function updateRoute() {
+      setIsTicketPulse(window.location.hash.split('?')[0] === '#/ticket-pulse')
+    }
+
+    window.addEventListener('hashchange', updateRoute)
+
+    return () => window.removeEventListener('hashchange', updateRoute)
+  }, [])
+
+  useEffect(() => {
+    if (isTicketPulse) {
+      return undefined
+    }
+
     async function loadProjects() {
       try {
         const apiProjects = await getProjects()
@@ -28,7 +44,11 @@ function App() {
     }
 
     loadProjects()
-  }, [])
+  }, [isTicketPulse])
+
+  if (isTicketPulse) {
+    return <TicketPulsePage />
+  }
 
   return (
     <>
