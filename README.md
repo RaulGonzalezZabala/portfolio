@@ -10,8 +10,14 @@ Base de un portfolio personal orientado a presentar proyectos y tecnologías. Es
 portfolio/
 ├── frontend/              # Interfaz React con Vite
 │   └── src/
-│       ├── components/    # Componentes reutilizables de interfaz
-│       ├── pages/         # Vistas principales y detalle de proyecto
+│       ├── components/    # Componentes compartidos del portfolio
+│       ├── examples/      # Demos aisladas por proyecto
+│       │   └── catalogo-local/
+│       │       ├── components/ # Filtros, tarjetas y cesta del catálogo
+│       │       ├── hooks/      # Carga del catálogo desde la API
+│       │       ├── services/   # Cliente de /api/catalog
+│       │       └── utils/      # Formateadores propios de la demo
+│       ├── pages/         # Otras vistas principales
 │       ├── services/      # Cliente centralizado de la API
 │       ├── data/          # Datos mock temporales
 │       ├── styles/        # CSS global y CSS por componente
@@ -84,7 +90,7 @@ npm install
 npm run dev
 ```
 
-Vite mostrará una URL local, normalmente `http://localhost:5173`. La primera pantalla incluye presentación, sobre mí, tecnologías, tarjetas de proyectos ficticios y un detalle seleccionable de cada proyecto.
+Vite mostrará una URL local, normalmente `http://localhost:5173`. La primera pantalla incluye presentación, sobre mí, tecnologías, tarjetas de proyectos ficticios y un detalle seleccionable de cada proyecto. La demo «Catálogo local ficticio» abre un catálogo de conservas inspirado en La Rioja con búsqueda, filtros y carrito en memoria; los productos y precios son de muestra y no se realizan pedidos ni pagos.
 
 ### Backend
 
@@ -102,7 +108,7 @@ Con el servidor activo, prueba `http://localhost:8000/api/health`. El punto de e
 
 ## Base de datos
 
-El esquema inicial está en `database/schema.sql`, los datos de demostración en `database/seed.sql`, la migración de TicketPulse en `database/ticket-pulse.sql`, la migración de usuarios en `database/auth.sql` y la ampliación de verificación/recuperación en `database/auth-security.sql`. Todos los datos del seed son ficticios y no representan experiencia profesional, clientes ni métricas.
+El esquema inicial está en `database/schema.sql`, los datos de demostración en `database/seed.sql`, la migración de TicketPulse en `database/ticket-pulse.sql`, la migración de usuarios en `database/auth.sql`, la ampliación de verificación/recuperación en `database/auth-security.sql` y el catálogo ficticio en `database/catalog.sql`. Todos los datos del seed son ficticios y no representan experiencia profesional, clientes ni métricas.
 
 En phpMyAdmin, crea una base de datos llamada `portfolio` con cotejamiento `utf8mb4_unicode_ci` e importa primero el esquema, después los datos de ejemplo, `ticket-pulse.sql`, `auth.sql` y finalmente `auth-security.sql`. También puedes utilizar una consola MySQL:
 
@@ -114,6 +120,29 @@ mysql -u root -p portfolio < database/ticket-pulse.sql
 mysql -u root -p portfolio < database/auth.sql
 mysql -u root -p portfolio < database/auth-security.sql
 ```
+
+El catálogo ficticio puede vivir en su propia base de datos, separada de `portfolio`. Créala, importa `catalog.sql` en ella y apunta el backend con `CATALOG_DB_NAME` en `backend/.env` (usa el mismo servidor y usuario salvo que definas `CATALOG_DB_USER` y `CATALOG_DB_PASSWORD`; ese usuario necesita permisos sobre la nueva base). Si no defines `CATALOG_DB_NAME`, el catálogo usa `portfolio`.
+
+```bash
+mysql -u root -p -e "CREATE DATABASE catalogo_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p catalogo_local < database/catalog.sql
+mysql -u root -p catalogo_local < database/catalog-orders.sql
+```
+
+#### Pagos del catálogo (Stripe, solo modo de pruebas)
+
+`catalog-orders.sql` crea `catalog_orders` y `catalog_order_items`. El usuario de la base necesita INSERT/UPDATE/DELETE sobre `catalogo_local`. Para pagar hace falta estar registrado; el backend calcula los precios desde la base de datos y crea una sesión de Stripe Checkout (los datos de la tarjeta nunca pasan por la aplicación). Configura en `backend/.env`:
+
+```
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...   # opcional: stripe listen --forward-to localhost:8000/api/catalog/stripe-webhook
+```
+
+Solo se aceptan claves `sk_test_`/`rk_test_`. Tarjeta de prueba: `4242 4242 4242 4242`, fecha futura y CVC cualquiera. Al volver de Stripe, el frontend confirma el pedido contra Stripe; el webhook es una red de seguridad.
+
+En **Mis pedidos**, los pedidos pagados permiten abrir una factura ficticia con los datos del envío y guardarla como PDF mediante el diálogo de impresión del navegador. Se genera a partir de los datos guardados del pedido, sin migración adicional; solo el propietario autenticado puede consultarla. Es una simulación sin validez fiscal ni desglose de impuestos, no una factura real ni un recibo enviado por correo.
+
+La sección **Prepara tu caja riojana** propone selecciones para distintas ocasiones usando los productos publicados del catálogo. Se pueden personalizar y añadir a la cesta como productos individuales, sin precio adicional de caja ni cambios en el proceso de pago.
 
 Importa cada migración una sola vez y en ese orden. `auth.sql` añade usuarios y una relación de propiedad a los eventos; `auth-security.sql` añade verificación de correo, recuperación, invalidación de sesiones y límites de intentos. Los eventos antiguos sin usuario no se mostrarán a ninguna cuenta. Ejecuta `auth-security.sql` también si ya habías aplicado `auth.sql`. Ajusta usuario y puerto a tu configuración local.
 
@@ -143,6 +172,7 @@ Con MySQL en marcha, la base de datos importada y la API iniciada, abre estas UR
 - `http://localhost:8000/api/projects/api-notas-ficticia` devuelve HTTP `404`, pues el seed lo marca como no publicado.
 - `http://localhost:8000/api/technologies` devuelve las tecnologías disponibles.
 - `http://localhost:8000/api/ticket-events` devuelve los eventos de TicketPulse después de importar la migración.
+- `http://localhost:8000/api/catalog/products` y `http://localhost:8000/api/catalog/categories` devuelven el catálogo ficticio (solo lectura) tras importar `database/catalog.sql`.
 
 Con la API activa, inicia también el frontend con `npm run dev` dentro de `frontend`. Vite se ejecuta habitualmente en `http://localhost:5173` y la API permite peticiones únicamente desde ese origen local.
 

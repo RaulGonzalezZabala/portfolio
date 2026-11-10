@@ -26,6 +26,57 @@ function handleApiRequest(string $method, string $path, array $config): never
         showProject(createDatabaseConnection($config['database']), $matches[1]);
     }
 
+    if ($path === '/api/catalog/products') {
+        ensureMethod($method, ['GET']);
+        listCatalogProducts(createDatabaseConnection($config['catalogDatabase']));
+    }
+
+    if ($path === '/api/catalog/categories') {
+        ensureMethod($method, ['GET']);
+        listCatalogCategories(createDatabaseConnection($config['catalogDatabase']));
+    }
+
+    if ($path === '/api/catalog/checkout') {
+        ensureMethod($method, ['POST']);
+        checkoutCatalogOrder(
+            createDatabaseConnection($config['database']),
+            createDatabaseConnection($config['catalogDatabase']),
+            $config,
+        );
+    }
+
+    if ($path === '/api/catalog/orders') {
+        ensureMethod($method, ['GET']);
+        listCatalogOrders(
+            createDatabaseConnection($config['database']),
+            createDatabaseConnection($config['catalogDatabase']),
+        );
+    }
+
+    if (preg_match('#^/api/catalog/orders/([a-f0-9-]{36})/invoice$#i', $path, $matches) === 1) {
+        ensureMethod($method, ['GET']);
+        showCatalogInvoice(
+            createDatabaseConnection($config['database']),
+            createDatabaseConnection($config['catalogDatabase']),
+            $matches[1],
+        );
+    }
+
+    if (preg_match('#^/api/catalog/orders/([a-f0-9-]{36})/confirm$#i', $path, $matches) === 1) {
+        ensureMethod($method, ['POST']);
+        confirmCatalogOrder(
+            createDatabaseConnection($config['database']),
+            createDatabaseConnection($config['catalogDatabase']),
+            $config,
+            $matches[1],
+        );
+    }
+
+    if ($path === '/api/catalog/stripe-webhook') {
+        ensureMethod($method, ['POST']);
+        receiveStripeWebhook(createDatabaseConnection($config['catalogDatabase']), $config);
+    }
+
     if ($path === '/api/technologies') {
         ensureMethod($method, ['GET']);
         listTechnologies(createDatabaseConnection($config['database']));

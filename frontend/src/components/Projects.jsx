@@ -28,7 +28,9 @@ function Projects({ projects, isLoading, error, selectedProjectSlug, onSelectPro
           {!isLoading && !error && projects.map((project) => (
             <ProjectCard
               key={project.id}
-              project={project}
+              project={project.slug === 'catalogo-local-ficticio'
+                ? { ...project, internalPath: '#/catalogo-local' }
+                : project}
               isSelected={project.slug === selectedProjectSlug}
               onSelect={onSelectProject}
             />

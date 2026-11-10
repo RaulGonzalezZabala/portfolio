@@ -1,7 +1,7 @@
 import { apiBaseUrl } from './api'
 import { getCsrfToken, setCsrfToken } from './sessionSecurity'
 
-async function request(path, options = {}) {
+export async function request(path, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,

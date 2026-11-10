@@ -41,6 +41,16 @@ function showProject(PDO $connection, string $slug): never
     sendJson(200, ['data' => $project]);
 }
 
+function listCatalogProducts(PDO $connection): never
+{
+    sendJson(200, ['data' => findCatalogProducts($connection)]);
+}
+
+function listCatalogCategories(PDO $connection): never
+{
+    sendJson(200, ['data' => findCatalogCategories($connection)]);
+}
+
 function listTechnologies(PDO $connection): never
 {
     sendJson(200, ['data' => findTechnologies($connection)]);

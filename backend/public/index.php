@@ -6,12 +6,16 @@ require_once dirname(__DIR__) . '/config/config.php';
 require_once dirname(__DIR__) . '/config/database.php';
 require_once dirname(__DIR__) . '/repositories/ProjectRepository.php';
 require_once dirname(__DIR__) . '/repositories/TechnologyRepository.php';
+require_once dirname(__DIR__) . '/repositories/CatalogRepository.php';
+require_once dirname(__DIR__) . '/repositories/CatalogOrderRepository.php';
 require_once dirname(__DIR__) . '/repositories/TicketEventRepository.php';
 require_once dirname(__DIR__) . '/repositories/UserRepository.php';
 require_once dirname(__DIR__) . '/repositories/AuthSecurityRepository.php';
 require_once dirname(__DIR__) . '/controllers/ApiController.php';
 require_once dirname(__DIR__) . '/controllers/AuthController.php';
 require_once dirname(__DIR__) . '/services/TransactionalEmailService.php';
+require_once dirname(__DIR__) . '/services/StripeService.php';
+require_once dirname(__DIR__) . '/controllers/CatalogOrderController.php';
 require_once dirname(__DIR__) . '/controllers/TicketEventController.php';
 require_once dirname(__DIR__) . '/routes/api.php';
 

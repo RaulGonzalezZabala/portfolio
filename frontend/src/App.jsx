@@ -6,11 +6,20 @@ import Hero from './components/Hero'
 import ProjectDetail from './components/ProjectDetail'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
+import CatalogPage from './examples/catalogo-local/CatalogPage'
 import TicketPulsePage from './pages/TicketPulsePage'
 import { getProjects } from './services/api'
 
+function getRoute() {
+  const hash = window.location.hash.split('?')[0]
+
+  return hash === '#/ticket-pulse' || hash === '#/catalogo-local'
+    ? hash
+    : 'portfolio'
+}
+
 function App() {
-  const [isTicketPulse, setIsTicketPulse] = useState(window.location.hash.split('?')[0] === '#/ticket-pulse')
+  const [route, setRoute] = useState(getRoute)
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -18,7 +27,7 @@ function App() {
 
   useEffect(() => {
     function updateRoute() {
-      setIsTicketPulse(window.location.hash.split('?')[0] === '#/ticket-pulse')
+      setRoute(getRoute())
     }
 
     window.addEventListener('hashchange', updateRoute)
@@ -27,7 +36,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (isTicketPulse) {
+    if (route !== 'portfolio') {
       return undefined
     }
 
@@ -44,10 +53,14 @@ function App() {
     }
 
     loadProjects()
-  }, [isTicketPulse])
+  }, [route])
 
-  if (isTicketPulse) {
+  if (route === '#/ticket-pulse') {
     return <TicketPulsePage />
+  }
+
+  if (route === '#/catalogo-local') {
+    return <CatalogPage />
   }
 
   return (
